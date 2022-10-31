@@ -68,6 +68,11 @@ void list_dtor (struct list_t* list)
 
 int list_insert_first (struct list_t* list, elem_t value)
 {
+    if (list->size >= list->capacity)
+    {
+        list_realloc (list, list->capacity * 2);
+    }
+
     int new_free = list->next[list->free];
 
     list->value[list->free] = value;
@@ -91,6 +96,11 @@ int list_insert_first (struct list_t* list, elem_t value)
 
 int list_insert_before (struct list_t* list, elem_t value, int index)
 {
+    if (list->size >= list->capacity)
+    {
+        list_realloc (list, list->capacity * 2);
+    }
+
     if (list->size == 0)
     {
         return list_insert_first (list, value);
@@ -107,6 +117,11 @@ int list_insert_before (struct list_t* list, elem_t value, int index)
 
 int list_insert_after (struct list_t* list, elem_t value, int index)
 {
+    if (list->size >= list->capacity)
+    {
+        list_realloc (list, list->capacity * 2);
+    }
+
     if (list->size == 0)
     {
         return list_insert_first (list, value);
@@ -138,6 +153,11 @@ int list_insert_after (struct list_t* list, elem_t value, int index)
 
 int list_insert_head (struct list_t* list, elem_t value)
 {
+    if (list->size >= list->capacity)
+    {
+        list_realloc (list, list->capacity * 2);
+    }
+
     if (list->size == 0)
     {
         return list_insert_first (list, value);
@@ -165,6 +185,11 @@ int list_insert_head (struct list_t* list, elem_t value)
 
 int list_insert_tail (struct list_t* list, elem_t value)
 {
+    if (list->size >= list->capacity)
+    {
+        list_realloc (list, list->capacity * 2);
+    }
+
     if (list->size == 0)
     {
         return list_insert_first (list, value);
@@ -345,9 +370,59 @@ int list_sorted (struct list_t* list)
     return GOOD_WORKING;
 }
 
-int list_recalloc (struct list_t* list)
+int list_realloc (struct list_t* list, size_t new_capacity)
 {
-    
+    elem_t* value_resize = (elem_t*) realloc (list->value, new_capacity * sizeof(elem_t));
+    if (value_resize == nullptr)
+    {
+        printf ("ERROR REALLOC on line %d in list.cpp", __LINE__);
+        return ERROR_REALLOC;
+    }
+    else
+    {
+        list->value = value_resize;
+    }
+
+    int* next_resize = (int*) realloc (list->next, new_capacity * sizeof(int));
+    if (next_resize == nullptr)
+    {
+        printf ("ERROR REALLOC on line %d in list.cpp", __LINE__);
+        return ERROR_REALLOC;
+    }
+    else
+    {
+        list->next = next_resize;
+    }
+
+    int* prev_resize = (int*) realloc (list->prev, new_capacity * sizeof(int));
+    if (prev_resize == nullptr)
+    {
+        printf ("ERROR REALLOC on line %d in list.cpp", __LINE__);
+        return ERROR_REALLOC;
+    }
+    else
+    {
+        list->prev = prev_resize;
+    }
+
+    if (new_capacity > list->capacity)
+    {
+        for (int i = list->capacity; i < new_capacity + 1; i++)
+        {
+            list->value[i] = POISON_VALUE;
+
+            list->next[i] = (i != list->capacity) ? (i + 1) : -1;
+            list->prev[i] = (i != 1) ? (i - 1) : -1;
+        }
+    }
+    else
+    {
+        list->next[new_capacity] = -1;
+    }
+
+    list->capacity = new_capacity;
+
+    return GOOD_WORKING;
 }
 
 //----------------------------------------------------------------------------
@@ -360,16 +435,6 @@ int list_head_element (struct list_t* list)
 int list_tail_element (struct list_t* list)
 {
     return list->tail;
-}
-
-int list_next_element (struct list_t* list, int index)
-{
-    
-}
-
-int list_prev_element (struct list_t* list, int index)
-{
-
 }
 
 elem_t list_value_element (struct list_t* list, int index)
@@ -386,11 +451,10 @@ size_t list_size (struct list_t* list)
 
 //----------------------------------------------------------------------------
 
-int list_is_empty (struct list_t* list)
+int list_is_null (struct list_t* list)
 {
 
 }
-//----------------------------------------------------------------------------
 
 void list_dump (struct list_t* list)
 {
@@ -439,4 +503,29 @@ void list_dump (struct list_t* list)
 
     fclose (list_log_file);
     free (list_status);
+}
+
+int list_error (struct list_t* list)
+{
+    int pointer_list_check_null = ((!list) ? LIST_ERROR_POINTER_STRUCT_NULL : 0);
+
+    if (pointer_list_check_null = 0)
+    {
+        list->code_error |= CHECK_ERROR (!list->value,                LIST_ERROR_POINTER_BUFFER_VALUE_NULL);
+        list->code_error |= CHECK_ERROR (!list->next,                 LIST_ERROR_POINTER_BUFFER_NEXT_NULL);
+        list->code_error |= CHECK_ERROR (!list->prev,                 LIST_ERROR_POINTER_BUFFER_PREV_NULL);
+        list->code_error |= CHECK_ERROR (list->size < 0,              LIST_ERROR_SIZE_SMALLER_ZERO);
+        list->code_error |= CHECK_ERROR (list->capacity < 0,          LIST_ERROR_CAPACITY_SMALLER_ZERO);
+        list->code_error |= CHECK_ERROR (list->size > list->capacity, LIST_ERROR_SIZE_BIGGER_CAPACITY);
+        list->code_error |= CHECK_ERROR (list->head > list->capacity, LIST_ERROR_HEAD_BIGGER_CAPACITY);
+        list->code_error |= CHECK_ERROR (list->tail > list->capacity, LIST_ERROR_TAIL_BIGGER_CAPACITY);
+
+
+
+    }
+}
+
+int decoder_list_error (struct list_t* list)
+{
+
 }

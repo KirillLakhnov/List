@@ -11,6 +11,18 @@
 
 typedef double elem_t;
 
+#define ASSERT_OK(list) do                                      \
+                        {                                       \
+                            if (list_error (list) != 0)         \
+                            {                                   \
+                                decoder_list_error (list);      \
+                                list_dump (list);               \
+                                abort ();                       \
+                            }                                   \
+                        } while (0)
+
+#define CHECK_ERROR(condition, error) (condition) ? error : 0
+
 const elem_t POISON_VALUE = NAN;
 const size_t SIZE_DTOR_VALUE = 0xBABADEDA;
 const int INT_DTOR_VALUE = 0xADAFDADA;
@@ -64,7 +76,7 @@ int list_find_physical_position_logical_index (struct list_t* list, int index);
 
 int list_sorted (struct list_t* list);
 
-int list_recalloc (struct list_t* list);
+int list_realloc (struct list_t* list, size_t new_capacity);
 
 //----------------------------------------------------------------------------
 
@@ -72,20 +84,18 @@ int list_head_element (struct list_t* list);
 
 int list_tail_element (struct list_t* list);
 
-int list_next_element (struct list_t* list, int index);
-
-int list_prev_element (struct list_t* list, int index);
-
 elem_t list_value_element (struct list_t* list, int index);
 
 size_t list_size (struct list_t* list);
 
 //----------------------------------------------------------------------------
 
-int list_is_empty (struct list_t* list);
-
-//----------------------------------------------------------------------------
+int list_is_null (struct list_t* list);
 
 void list_dump (struct list_t* list);
+
+int list_error (struct list_t* list);
+
+int decoder_list_error (struct list_t* list);
 
 #endif // LIST_H
