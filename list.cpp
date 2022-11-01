@@ -1,26 +1,28 @@
 #include "list.h"
 
-int list_ctor (struct list_t* list, size_t capacity)
+int list_ctor (struct list_t* list)
 {
+    assert (list);
+
     list->size = 0;
-    list->capacity = capacity;
+    list->capacity = 10;
     list->sorted = 0;
     list->free = 1;
     list->code_error = 0;
 
-    list->value = (elem_t*) calloc (capacity + 1, sizeof(elem_t));
+    list->value = (elem_t*) calloc (list->capacity + 1, sizeof(elem_t));
     if (list->value == nullptr)
     {
         printf ("ERROR CALLOC on line %d in list.cpp", __LINE__);
         return ERROR_CALLOC;
     }
-    list->next = (int*) calloc (capacity + 1, sizeof(int));
+    list->next = (int*) calloc (list->capacity + 1, sizeof(int));
     if (list->next == nullptr)
     {
         printf ("ERROR CALLOC on line %d in list.cpp", __LINE__);
         return ERROR_CALLOC;
     }
-    list->prev = (int*) calloc (capacity + 1, sizeof (int));
+    list->prev = (int*) calloc (list->capacity + 1, sizeof (int));
     if (list->prev == nullptr)
     {
         printf ("ERROR CALLOC on line %d in list.cpp", __LINE__);
@@ -35,11 +37,15 @@ int list_ctor (struct list_t* list, size_t capacity)
         list->prev[i] = (i != 1) ? (i - 1) : -1;
     }
 
+    ASSERT_OK (list);
+
     return GOOD_WORKING;
 }
 
 void list_dtor (struct list_t* list)
 {
+    ASSERT_OK (list);
+
     if (list->value != nullptr)
     {
         free (list->value);
@@ -56,8 +62,8 @@ void list_dtor (struct list_t* list)
         list->prev = nullptr;
     }
 
-    list->size = SIZE_DTOR_VALUE;
     list->capacity = SIZE_DTOR_VALUE;
+    list->size     = SIZE_DTOR_VALUE;
 
     list->head = INT_DTOR_VALUE;
     list->tail = INT_DTOR_VALUE; 
@@ -68,6 +74,8 @@ void list_dtor (struct list_t* list)
 
 int list_insert_first (struct list_t* list, elem_t value)
 {
+    ASSERT_OK (list);
+
     if (list->size >= list->capacity)
     {
         list_realloc (list, list->capacity * 2);
@@ -90,12 +98,15 @@ int list_insert_first (struct list_t* list, elem_t value)
     list->size++;
 
     list_dump (list);
+    ASSERT_OK (list);
 
     return GOOD_WORKING;
 }
 
 int list_insert_before (struct list_t* list, elem_t value, int index)
 {
+    ASSERT_OK (list);
+
     if (list->size >= list->capacity)
     {
         list_realloc (list, list->capacity * 2);
@@ -111,12 +122,15 @@ int list_insert_before (struct list_t* list, elem_t value, int index)
     }
 
     list_dump (list);
+    ASSERT_OK (list);
 
     return list_insert_after (list, value, index - 1);
 }
 
 int list_insert_after (struct list_t* list, elem_t value, int index)
 {
+    ASSERT_OK (list);
+
     if (list->size >= list->capacity)
     {
         list_realloc (list, list->capacity * 2);
@@ -147,12 +161,15 @@ int list_insert_after (struct list_t* list, elem_t value, int index)
     list->size++;
 
     list_dump (list);
+    ASSERT_OK (list);
 
     return GOOD_WORKING;
 }
 
 int list_insert_head (struct list_t* list, elem_t value)
 {
+    ASSERT_OK (list);
+
     if (list->size >= list->capacity)
     {
         list_realloc (list, list->capacity * 2);
@@ -179,12 +196,15 @@ int list_insert_head (struct list_t* list, elem_t value)
     list->size++;
 
     list_dump (list);
+    ASSERT_OK (list);
 
     return GOOD_WORKING;
 }
 
 int list_insert_tail (struct list_t* list, elem_t value)
 {
+    ASSERT_OK (list);
+
     if (list->size >= list->capacity)
     {
         list_realloc (list, list->capacity * 2);
@@ -211,12 +231,15 @@ int list_insert_tail (struct list_t* list, elem_t value)
     list->size++;
 
     list_dump (list);
+    ASSERT_OK (list);
 
     return GOOD_WORKING;
 }
 
 int list_delete (struct list_t* list, int index)
 {
+    ASSERT_OK (list);
+
     if (index == 0)
     {
         return list_delete_head (list);
@@ -242,12 +265,15 @@ int list_delete (struct list_t* list, int index)
     list->size--;
 
     list_dump (list);
+    ASSERT_OK (list);
 
     return GOOD_WORKING;
 }
 
 int list_delete_head (struct list_t* list)
 {
+    ASSERT_OK (list);
+
     int new_head = list->next[list->head];
     int new_free = list->head;
 
@@ -265,12 +291,15 @@ int list_delete_head (struct list_t* list)
     list->size--;
 
     list_dump (list);
+    ASSERT_OK (list);
 
     return GOOD_WORKING;
 }
 
 int list_delete_tail (struct list_t* list)
 {
+    ASSERT_OK (list);
+
     int new_tail = list->prev[list->tail];
     int new_free = list->tail;
 
@@ -288,6 +317,7 @@ int list_delete_tail (struct list_t* list)
     list->size--;
 
     list_dump (list);
+    ASSERT_OK (list);
 
     return GOOD_WORKING;
 }
@@ -296,6 +326,8 @@ int list_delete_tail (struct list_t* list)
 
 int list_find_physical_position_logical_index (struct list_t* list, int index)
 {
+    ASSERT_OK (list);
+
     if (list->sorted)
     {
         return index;
@@ -307,11 +339,15 @@ int list_find_physical_position_logical_index (struct list_t* list, int index)
         physical_position = list->next[physical_position];
     }
 
+    ASSERT_OK (list);
+
     return physical_position;
 }
 
 int list_sorted (struct list_t* list)
 {
+    ASSERT_OK (list);
+
     elem_t* value_new = (elem_t*) calloc (list->capacity + 1, sizeof(elem_t));
     if (list->value == nullptr)
     {
@@ -366,12 +402,15 @@ int list_sorted (struct list_t* list)
     free (prev_old);
 
     list_dump (list);
+    ASSERT_OK (list);
 
     return GOOD_WORKING;
 }
 
 int list_realloc (struct list_t* list, size_t new_capacity)
 {
+    ASSERT_OK (list);
+
     elem_t* value_resize = (elem_t*) realloc (list->value, new_capacity * sizeof(elem_t));
     if (value_resize == nullptr)
     {
@@ -422,6 +461,8 @@ int list_realloc (struct list_t* list, size_t new_capacity)
 
     list->capacity = new_capacity;
 
+    ASSERT_OK (list);
+
     return GOOD_WORKING;
 }
 
@@ -451,14 +492,15 @@ size_t list_size (struct list_t* list)
 
 //----------------------------------------------------------------------------
 
-int list_is_null (struct list_t* list)
+int list_dump (struct list_t* list)
 {
-
-}
-
-void list_dump (struct list_t* list)
-{
+#ifndef NDEBUG
     FILE* list_log_file = fopen("list_log_file.txt", "ab");
+    if (list_log_file == nullptr)
+    {
+        printf ("ERROR FOPEN on line %d in list.cpp", __LINE__);
+        return ERROR_FILE_OPEN;
+    }
 
     char* list_status = (char*) calloc (10, sizeof(char));
 
@@ -468,18 +510,20 @@ void list_dump (struct list_t* list)
     }
     else
     {
+        decoder_list_error (list);
         strcpy (list_status, "ERROR");
     }
 
     fprintf (list_log_file, "List[%p] (%s)\n", list, list_status);
     fprintf (list_log_file, "{\n\t size       = %ld"
-                            "\n\t capacity   = %ld"
-                            "\n\t code_error = %ld"
-                            "\n\t head       = %d"
-                            "\n\t tail       = %d"
-                            "\n\t free       = %d"
-                            "\n\t {\n",
-                            list->size, list->capacity, list->code_error, list->head, list->tail, list->free);
+                             "\n\t capacity   = %ld"
+                             "\n\t code_error = %ld"
+                             "\n\t head       = %d"
+                             "\n\t tail       = %d"
+                             "\n\t free       = %d"
+                             "\n\t {\n",
+                             list->size, list->capacity, list->code_error, 
+                             list->head, list->tail, list->free);
     fprintf (list_log_file, "\t\tvalue[%p]:\t", list->value);
     for (int i = 0; i < list->capacity + 1; i++)
     {
@@ -501,15 +545,23 @@ void list_dump (struct list_t* list)
 
     fprintf (list_log_file, "\n----------------------------------------------------------------------------\n");
 
-    fclose (list_log_file);
+    if (fclose (list_log_file))
+    {
+        printf ("ERROR FCLOSE on line %d in list.cpp", __LINE__);
+        return ERROR_FILE_OPEN;
+    }
+
     free (list_status);
+#endif
+    return GOOD_WORKING;
 }
 
 int list_error (struct list_t* list)
 {
+#ifndef NDEBUG
     int pointer_list_check_null = ((!list) ? LIST_ERROR_POINTER_STRUCT_NULL : 0);
 
-    if (pointer_list_check_null = 0)
+    if (pointer_list_check_null == 0)
     {
         list->code_error |= CHECK_ERROR (!list->value,                LIST_ERROR_POINTER_BUFFER_VALUE_NULL);
         list->code_error |= CHECK_ERROR (!list->next,                 LIST_ERROR_POINTER_BUFFER_NEXT_NULL);
@@ -519,13 +571,39 @@ int list_error (struct list_t* list)
         list->code_error |= CHECK_ERROR (list->size > list->capacity, LIST_ERROR_SIZE_BIGGER_CAPACITY);
         list->code_error |= CHECK_ERROR (list->head > list->capacity, LIST_ERROR_HEAD_BIGGER_CAPACITY);
         list->code_error |= CHECK_ERROR (list->tail > list->capacity, LIST_ERROR_TAIL_BIGGER_CAPACITY);
-
-
-
     }
+
+    return list->code_error;
+#else
+    return GOOD_WORKING;
+#endif
 }
 
 int decoder_list_error (struct list_t* list)
 {
+#ifndef NDEBUG
+    FILE* list_log_file = fopen ("list_log_file.txt", "ab");
+    if (list_log_file == nullptr)
+    {
+        printf ("ERROR FOPEN on line %d in list.cpp", __LINE__);
+        return ERROR_FILE_OPEN;
+    }
 
+    PRINT_ERROR (list->code_error, LIST_ERROR_POINTER_BUFFER_VALUE_NULL);
+    PRINT_ERROR (list->code_error, LIST_ERROR_POINTER_BUFFER_NEXT_NULL);
+    PRINT_ERROR (list->code_error, LIST_ERROR_POINTER_BUFFER_PREV_NULL);
+    PRINT_ERROR (list->code_error, LIST_ERROR_SIZE_SMALLER_ZERO);
+    PRINT_ERROR (list->code_error, LIST_ERROR_CAPACITY_SMALLER_ZERO);
+    PRINT_ERROR (list->code_error, LIST_ERROR_SIZE_BIGGER_CAPACITY);
+    PRINT_ERROR (list->code_error, LIST_ERROR_HEAD_BIGGER_CAPACITY);
+    PRINT_ERROR (list->code_error, LIST_ERROR_TAIL_BIGGER_CAPACITY);
+
+    if (fclose (list_log_file) < 0)
+    {
+        printf ("ERROR FCLOSE on line %d in list.cpp", __LINE__);
+        return ERROR_FILE_CLOSE;
+    }
+#endif
+
+    return GOOD_WORKING;
 }

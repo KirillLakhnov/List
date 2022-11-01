@@ -1,6 +1,8 @@
 #ifndef LIST_H
 #define LIST_H
 
+// #define NDEBUG
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -11,17 +13,30 @@
 
 typedef double elem_t;
 
+#define specifier_elem_t "%f"
+
+#ifndef NDEBUG
 #define ASSERT_OK(list) do                                      \
                         {                                       \
                             if (list_error (list) != 0)         \
                             {                                   \
-                                decoder_list_error (list);      \
                                 list_dump (list);               \
                                 abort ();                       \
                             }                                   \
                         } while (0)
 
 #define CHECK_ERROR(condition, error) (condition) ? error : 0
+
+#define PRINT_ERROR(code_of_error_programm, error)  if (code_of_error_programm & error)                         \
+                                                    {                                                           \
+                                                        fprintf (list_log_file, "%s\n", #error);                \
+                                                    }
+
+#else
+#define ASSERT_OK(list)
+#define CHECK_ERROR(condition, error)
+#define PRINT_ERROR(code_of_error_programm, error)
+#endif
 
 const elem_t POISON_VALUE = NAN;
 const size_t SIZE_DTOR_VALUE = 0xBABADEDA;
@@ -48,7 +63,7 @@ struct list_t
 
 //----------------------------------------------------------------------------
 
-int list_ctor (struct list_t* list, size_t capacity);
+int list_ctor (struct list_t* list);
 
 void list_dtor (struct list_t* list);
 
@@ -90,9 +105,7 @@ size_t list_size (struct list_t* list);
 
 //----------------------------------------------------------------------------
 
-int list_is_null (struct list_t* list);
-
-void list_dump (struct list_t* list);
+int list_dump (struct list_t* list);
 
 int list_error (struct list_t* list);
 

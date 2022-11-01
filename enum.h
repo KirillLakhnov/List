@@ -2,9 +2,13 @@
 #define ENUM_H
 
 enum ERROR_FUNCTION {
-    GOOD_WORKING  = 0,
-    ERROR_CALLOC  = 1,
-    ERROR_REALLOC = 2,
+    GOOD_WORKING     = 0,
+    
+    ERROR_CALLOC     = 1,
+    ERROR_REALLOC    = 2,
+
+    ERROR_FILE_OPEN  = 3,
+    ERROR_FILE_CLOSE = 4,
 };
 
 enum LIST_ERROR {
@@ -17,7 +21,6 @@ enum LIST_ERROR {
     LIST_ERROR_SIZE_BIGGER_CAPACITY       = 1 << 6,
     LIST_ERROR_HEAD_BIGGER_CAPACITY       = 1 << 7,
     LIST_ERROR_TAIL_BIGGER_CAPACITY       = 1 << 8,
-
 };
 
 #endif // ENUM_H

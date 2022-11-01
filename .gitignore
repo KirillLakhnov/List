@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+all_list
+list_debug
+list_release

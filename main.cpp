@@ -4,7 +4,7 @@ int main ()
 {
     struct list_t list = {};
 
-    if (list_ctor (&list, 10) != GOOD_WORKING)
+    if (list_ctor (&list) != GOOD_WORKING)
     {
         return -1;
     }
@@ -15,9 +15,7 @@ int main ()
     list_insert_tail (&list, 34.89);
     list_insert_before (&list, 111, 1);
     list_insert_tail (&list, 17.867);
-
     list_delete (&list, 2);
-
     list_sorted (&list);
 
     list_dtor (&list);
