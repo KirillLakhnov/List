@@ -11,4 +11,11 @@ enum ERROR_FUNCTION {
     ERROR_FILE_CLOSE = 4,
 };
 
+enum LIST_ERROR {
+    LIST_ERROR_POINTER_STRUCT_NULL        = 1 << 0,
+    LIST_ERROR_HEAD_NULL                  = 1 << 1,
+    LIST_ERROR_TAIL_NULL                  = 1 << 2,
+    LIST_ERROR_SIZE_SMALLER_ZERO          = 1 << 3,
+};
+
 #endif // ENUM_H

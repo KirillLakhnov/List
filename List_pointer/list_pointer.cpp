@@ -5,15 +5,17 @@ int list_pointer_ctor (struct list_pointer_t* list_pointer)
     assert (list_pointer);
 
     list_pointer->size = 0;
-    list_pointer->head = 0;
-    list_pointer->tail = 0;
+    list_pointer->head = nullptr;
+    list_pointer->tail = nullptr;
+
+    list_pointer->code_error = 0;
 
     return GOOD_WORKING;
 }
 
 void list_pointer_dtor (struct list_pointer_t* list_pointer)
 {
-    assert (list_pointer);
+    ASSERT_OK (list_pointer);
 
     list_element* current_elem = list_pointer->head;
     list_element* next_elem = nullptr;
@@ -45,7 +47,7 @@ void list_pointer_dtor (struct list_pointer_t* list_pointer)
 
 int list_pointer_insert_first (struct list_pointer_t* list_pointer, elem_t value)
 {
-    assert (list_pointer);
+    ASSERT_OK (list_pointer);
 
     list_element* new_elem = (list_element*) calloc (1, sizeof(list_element));
     if (new_elem == nullptr)
@@ -62,12 +64,14 @@ int list_pointer_insert_first (struct list_pointer_t* list_pointer, elem_t value
     list_pointer->head = new_elem;
     list_pointer->tail = new_elem;
 
+    ASSERT_OK (list_pointer);
+
     return GOOD_WORKING;
 }
 
 int list_pointer_insert_before (struct list_pointer_t* list_pointer, elem_t value, int index) //____________
 {
-    assert (list_pointer);
+    ASSERT_OK (list_pointer);
 
     if (list_pointer->size == 0)
     {
@@ -83,7 +87,7 @@ int list_pointer_insert_before (struct list_pointer_t* list_pointer, elem_t valu
 
 int list_pointer_insert_after (struct list_pointer_t* list_pointer, elem_t value, int index)
 {
-    assert(list_pointer);
+    ASSERT_OK (list_pointer);
 
     if (list_pointer->size == 0)
     {
@@ -111,12 +115,14 @@ int list_pointer_insert_after (struct list_pointer_t* list_pointer, elem_t value
 
     list_pointer->size++;
 
+    ASSERT_OK (list_pointer);
+
     return GOOD_WORKING;
 }
 
 int list_pointer_insert_head (struct list_pointer_t* list_pointer, elem_t value)
 {
-    assert(list_pointer);
+    ASSERT_OK (list_pointer);
     
     if (list_pointer->size == 0)
     {
@@ -141,12 +147,14 @@ int list_pointer_insert_head (struct list_pointer_t* list_pointer, elem_t value)
 
     list_pointer->size++;
 
+    ASSERT_OK (list_pointer);
+
     return GOOD_WORKING;
 }
 
 int list_pointer_insert_tail (struct list_pointer_t* list_pointer, elem_t value)
 {
-    assert(list_pointer);
+    ASSERT_OK (list_pointer);
 
     if (list_pointer->size == 0)
     {
@@ -170,13 +178,15 @@ int list_pointer_insert_tail (struct list_pointer_t* list_pointer, elem_t value)
     list_pointer->tail = new_elem;
 
     list_pointer->size++;
+
+    ASSERT_OK (list_pointer);
     
     return GOOD_WORKING;
 }
 
 int list_pointer_delete (struct list_pointer_t* list_pointer, int index)
 {
-    assert (list_pointer);
+    ASSERT_OK (list_pointer);
 
     list_element* current_elem = list_pointer_find_element_by_index (list_pointer, index);
 
@@ -209,6 +219,8 @@ int list_pointer_delete (struct list_pointer_t* list_pointer, int index)
 
     list_pointer->size--;
 
+    ASSERT_OK (list_pointer);
+
     return GOOD_WORKING;
 }
 
@@ -216,7 +228,7 @@ int list_pointer_delete (struct list_pointer_t* list_pointer, int index)
 
 list_element* list_pointer_find_element_by_index (struct list_pointer_t* list_pointer, int index)
 {
-    assert(list_pointer);
+    ASSERT_OK (list_pointer);
 
     list_element* current_elem = list_pointer->head;
 
@@ -230,21 +242,21 @@ list_element* list_pointer_find_element_by_index (struct list_pointer_t* list_po
 
 list_element* list_pointer_head_element (struct list_pointer_t* list_pointer)
 {
-    assert(list_pointer);
+    ASSERT_OK (list_pointer);
 
     return list_pointer->head;
 }
 
 list_element* list_pointer_tail_element (struct list_pointer_t* list_pointer)
 {
-    assert(list_pointer);
+    ASSERT_OK (list_pointer);
 
     return list_pointer->tail;
 }
 
 list_element* list_pointer_next_element(struct list_pointer_t* list_pointer, struct list_element* current_elem)
 {
-    assert (list_pointer);
+    ASSERT_OK (list_pointer);
     assert (current_elem);
 
     return current_elem->next;
@@ -252,7 +264,7 @@ list_element* list_pointer_next_element(struct list_pointer_t* list_pointer, str
 
 list_element* list_pointer_prev_element(struct list_pointer_t* list_pointer, struct list_element* current_elem)
 {
-    assert (list_pointer);
+    ASSERT_OK (list_pointer);
     assert (current_elem);
 
     return current_elem->prev;
@@ -260,7 +272,7 @@ list_element* list_pointer_prev_element(struct list_pointer_t* list_pointer, str
 
 elem_t list_pointer_value_element (struct list_pointer_t* list_pointer, int index) //___________________
 {
-    assert (list_pointer);
+    ASSERT_OK (list_pointer);
 
     list_element* current_elem = list_pointer_find_element_by_index (list_pointer, index);
 
@@ -309,8 +321,8 @@ int list_pointer_graph_dump (struct list_pointer_t* list_pointer)
     }
 
     fprintf (list_log_graph,    "\t\"LIST_INFO\" [shape = \"record\", style = \"rounded, filled\", fontname = \"Helvetica-Bold\"\n\t\t\t\t "
-				                "label = \"SIZE = %lu\"]\n",
-                                list_pointer->size );
+				                "label = \"SIZE = %lu\\lCODE ERROR = %lu\"]\n",
+                                list_pointer->size, list_pointer->code_error);
     fprintf(list_log_graph, "\t\"LIST DUMP for List[%p]\"[color = \"white\"]\t", list_pointer);
 
     if (list_pointer->size == 1)
@@ -340,6 +352,24 @@ int list_pointer_graph_dump (struct list_pointer_t* list_pointer)
     system("dot -Tjpeg -oList_pointer/graph_log_list.jpeg List_pointer/graph_log.dot");
 
     return GOOD_WORKING;
+}
+
+int list_pointer_error (struct list_pointer_t* list_pointer)
+{
+#ifndef NDEBUG
+    int pointer_list_check_null = ((!list_pointer) ? LIST_ERROR_POINTER_STRUCT_NULL : 0);
+
+    if (pointer_list_check_null == 0)
+    {
+        list_pointer->code_error |= CHECK_ERROR (!list_pointer->head && (list_pointer->size > 1), LIST_ERROR_HEAD_NULL);
+        list_pointer->code_error |= CHECK_ERROR (!list_pointer->tail && (list_pointer->size > 1), LIST_ERROR_TAIL_NULL);
+        list_pointer->code_error |= CHECK_ERROR (list_pointer->size < 0,                          LIST_ERROR_SIZE_SMALLER_ZERO);
+    }
+
+    return list_pointer->code_error;
+#else
+    return GOOD_WORKING;
+#endif
 }
 
 int isnan (double number)

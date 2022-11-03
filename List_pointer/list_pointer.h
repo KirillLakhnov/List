@@ -13,6 +13,29 @@ typedef double elem_t;
 
 #define specifier_elem_t "%lf"
 
+#ifndef NDEBUG
+#define ASSERT_OK(list_pointer) do                                                      \
+                                {                                                       \
+                                    if (list_pointer_error (list_pointer) != 0)         \
+                                    {                                                   \
+                                        list_pointer_graph_dump (list_pointer);         \
+                                        abort ();                                       \
+                                    }                                                   \
+                                } while (0)
+
+#define CHECK_ERROR(condition, error) (condition) ? error : 0
+
+#define PRINT_ERROR(code_of_error_programm, error)  if (code_of_error_programm & error)                         \
+                                                    {                                                           \
+                                                        fprintf (list_log_file, "%s\n", #error);                \
+                                                    }
+
+#else
+#define ASSERT_OK(list_pointer)
+#define CHECK_ERROR(condition, error)
+#define PRINT_ERROR(code_of_error_programm, error)
+#endif
+
 const elem_t POISON_VALUE = NAN;
 const size_t SIZE_DTOR_VALUE = 0xBABADEDA;
 const int INT_DTOR_VALUE = 0xADAFDADA;
@@ -31,6 +54,8 @@ struct list_pointer_t
     struct list_element* tail;
 
     size_t size;
+
+    size_t code_error;
 };
 
 int list_pointer_ctor (struct list_pointer_t* list_pointer);
@@ -70,6 +95,8 @@ size_t list_pointer_size (struct list_pointer_t* list_pointer);
 //----------------------------------------------------------------------------
 
 int list_pointer_graph_dump (struct list_pointer_t* list_pointer);
+
+int list_pointer_error (struct list_pointer_t* list_pointer);
 
 int isnan (double number); 
 
