@@ -13,7 +13,7 @@
 
 typedef double elem_t;
 
-#define specifier_elem_t "%f"
+#define specifier_elem_t "%lf"
 
 #ifndef NDEBUG
 #define ASSERT_OK(list) do                                      \
@@ -51,9 +51,6 @@ struct list_t
 
     size_t size;
     size_t capacity;
-
-    int head;
-    int tail;
     int free;
 
     size_t code_error;
@@ -105,10 +102,16 @@ size_t list_size (struct list_t* list);
 
 //----------------------------------------------------------------------------
 
+int list_graph_dump (struct list_t* list);
+
 int list_dump (struct list_t* list);
 
 int list_error (struct list_t* list);
 
 int decoder_list_error (struct list_t* list);
+
+int isnan (double number);
+
+int isfree (struct list_t* list, int index);
 
 #endif // LIST_H

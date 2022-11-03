@@ -1,0 +1,50 @@
+digraph G
+{
+	graph [dpi = 300];
+	rankdir = LR;
+	"Nod_0" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#F4A460",
+		   label = "index = NULL_ELEMENT | {<prev> prev = 3 |value = 0.000000 | <next> next = 1}"]
+	"Nod_1" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#87CEFA",
+		   label = "index = 1 | {<prev> prev = 0|value = 111.000000 | <next> next = 2}"]
+	"Nod_2" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#87CEFA",
+		   label = "index = 2 | {<prev> prev = 1|value = 121.000000 | <next> next = 3}"]
+	"Nod_3" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#87CEFA",
+		   label = "index = 3 | {<prev> prev = 2|value = 17.867000 | <next> next = 0}"]
+	"Nod_4" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#FA8072",
+		   label = "index = 4 | {<prev> prev = -1|value = POISON_VALUE | <next> next = 5}"]
+	"Nod_5" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#FA8072",
+		   label = "index = 5 | {<prev> prev = 4|value = POISON_VALUE | <next> next = 6}"]
+	"Nod_6" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#FA8072",
+		   label = "index = 6 | {<prev> prev = 5|value = POISON_VALUE | <next> next = 7}"]
+	"Nod_7" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#FA8072",
+		   label = "index = 7 | {<prev> prev = 6|value = POISON_VALUE | <next> next = 8}"]
+	"Nod_8" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#FA8072",
+		   label = "index = 8 | {<prev> prev = 7|value = POISON_VALUE | <next> next = 9}"]
+	"Nod_9" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#FA8072",
+		   label = "index = 9 | {<prev> prev = 8|value = POISON_VALUE | <next> next = 10}"]
+	"Nod_10" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#FA8072",
+		   label = "index = 10 | {<prev> prev = 9|value = POISON_VALUE | <next> next = -1}"]
+	"LIST_INFO" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold"
+				 label = "SIZE = 3\lCAPACITY = 10\lFIRST FREE = 4\lCODE OF ERROR = 0"]
+	"LIST DUMP for List[0x7ffeed2c97a8] (OK)"[color = "white"]	"Nod_0"->"Nod_1"[style = "invis", weight=1000]
+	"Nod_1"->"Nod_2"[style = "invis", weight=1000]
+	"Nod_2"->"Nod_3"[style = "invis", weight=1000]
+	"Nod_3"->"Nod_4"[style = "invis", weight=1000]
+	"Nod_4"->"Nod_5"[style = "invis", weight=1000]
+	"Nod_5"->"Nod_6"[style = "invis", weight=1000]
+	"Nod_6"->"Nod_7"[style = "invis", weight=1000]
+	"Nod_7"->"Nod_8"[style = "invis", weight=1000]
+	"Nod_8"->"Nod_9"[style = "invis", weight=1000]
+	"Nod_9"->"Nod_10"[style = "invis", weight=1000]
+	"Nod_1":next -> "Nod_2":prev[style = "bold", color = "#df1b1bdf"]
+	"Nod_2":next -> "Nod_3":prev[style = "bold", color = "#df1b1bdf"]
+	"Nod_3":next -> "Nod_0":prev[style = "bold", color = "#df1b1bdf"]
+	"Nod_0":next -> "Nod_1":prev[style = "bold", color = "#df1b1bdf"]
+	"Nod_4":next -> "Nod_5":prev[style = "bold", color = "#1b4cdfe0"]
+	"Nod_5":next -> "Nod_6":prev[style = "bold", color = "#1b4cdfe0"]
+	"Nod_6":next -> "Nod_7":prev[style = "bold", color = "#1b4cdfe0"]
+	"Nod_7":next -> "Nod_8":prev[style = "bold", color = "#1b4cdfe0"]
+	"Nod_8":next -> "Nod_9":prev[style = "bold", color = "#1b4cdfe0"]
+	"Nod_9":next -> "Nod_10":prev[style = "bold", color = "#1b4cdfe0"]
+
+}

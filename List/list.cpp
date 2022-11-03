@@ -29,6 +29,7 @@ int list_ctor (struct list_t* list)
         return ERROR_CALLOC;
     }
 
+    list->value[0] = POISON_VALUE;
     for (int i = 1; i < list->capacity + 1; i++)
     {
         list->value[i] = POISON_VALUE;
@@ -65,8 +66,6 @@ void list_dtor (struct list_t* list)
     list->capacity = SIZE_DTOR_VALUE;
     list->size     = SIZE_DTOR_VALUE;
 
-    list->head = INT_DTOR_VALUE;
-    list->tail = INT_DTOR_VALUE; 
     list->free = INT_DTOR_VALUE; 
 }
 
@@ -87,11 +86,11 @@ int list_insert_first (struct list_t* list, elem_t value)
 
     list->prev[list->next[list->free]] = -1;
 
-    list->next[list->free] = -1;
-    list->prev[list->free] = -1;
+    list->next[list->free] = 0;
+    list->prev[list->free] = 0;
 
-    list->head = list->free;
-    list->tail = list->free;
+    list->next[0] = list->free;
+    list->prev[0] = list->free;
 
     list->free = new_free;
 
@@ -184,11 +183,11 @@ int list_insert_head (struct list_t* list, elem_t value)
 
     list->value[list->free] = value;
 
-    list->prev[list->head] = list->free;
-    list->next[list->free] = list->head;
-    list->prev[list->free] = -1;
+    list->prev[list->next[0]] = list->free;
+    list->next[list->free] = list->next[0];
+    list->prev[list->free] = 0;
 
-    list->head = list->free;
+    list->next[0] = list->free;
     list->free = new_free;
 
     list->prev[list->free] = -1;
@@ -219,11 +218,11 @@ int list_insert_tail (struct list_t* list, elem_t value)
 
     list->value[list->free] = value;
 
-    list->next[list->tail] = list->free;
-    list->prev[list->free] = list->tail;
-    list->next[list->free] = -1;
+    list->next[list->prev[0]] = list->free;
+    list->prev[list->free] = list->prev[0];
+    list->next[list->free] = 0;
 
-    list->tail = list->free;
+    list->prev[0] = list->free;
     list->free = new_free;
 
     list->prev[list->free] = -1;
@@ -274,19 +273,19 @@ int list_delete_head (struct list_t* list)
 {
     ASSERT_OK (list);
 
-    int new_head = list->next[list->head];
-    int new_free = list->head;
+    int new_head = list->next[list->next[0]];
+    int new_free = list->next[0];
 
-    list->value[list->head] = POISON_VALUE;
+    list->value[list->next[0]] = POISON_VALUE;
 
-    list->prev[list->next[list->head]] = -1;
+    list->prev[list->next[list->next[0]]] = 0;
 
-    list->prev[list->free] = list->head;
-    list->next[list->head] = list->free;
-    list->prev[list->head] = -1;
+    list->prev[list->free] = list->next[0];
+    list->next[list->next[0]] = list->free;
+    list->prev[list->next[0]] = -1;
 
     list->free = new_free;
-    list->head = new_head;
+    list->next[0] = new_head;
 
     list->size--;
 
@@ -300,19 +299,19 @@ int list_delete_tail (struct list_t* list)
 {
     ASSERT_OK (list);
 
-    int new_tail = list->prev[list->tail];
-    int new_free = list->tail;
+    int new_tail = list->prev[list->prev[0]];
+    int new_free = list->prev[0];
 
-    list->value[list->tail] = POISON_VALUE;
+    list->value[list->prev[0]] = POISON_VALUE;
 
-    list->next[list->prev[list->tail]] = -1;
+    list->next[list->prev[list->prev[0]]] = 0;
 
-    list->prev[list->free] = list->tail;
-    list->next[list->tail] = list->free;
-    list->prev[list->tail] = -1;
+    list->prev[list->free] = list->prev[0];
+    list->next[list->prev[0]] = list->free;
+    list->prev[list->prev[0]] = -1;
 
     list->free = new_free;
-    list->tail = new_tail;
+    list->prev[0] = new_tail;
 
     list->size--;
 
@@ -333,7 +332,7 @@ int list_find_physical_position_logical_index (struct list_t* list, int index)
         return index;
     }
 
-    int physical_position = list->head;
+    int physical_position = list->next[0];
     for (int i = 0; i < index; i++)
     {
         physical_position = list->next[physical_position];
@@ -367,11 +366,11 @@ int list_sorted (struct list_t* list)
         return ERROR_CALLOC;
     }
 
-    for (int i = 1, current_position = list->head; i <= list->size; i++, current_position = list->next[current_position])
+    for (int i = 1, current_position = list->next[0]; i <= list->size; i++, current_position = list->next[current_position])
     {
         value_new[i] = list->value[current_position];
-        next_new[i] = (i != list->size) ? (i + 1) : -1;
-        prev_new[i] = (i != 1) ? (i - 1) : -1;
+        next_new[i] = (i != list->size) ? (i + 1) : 0;
+        prev_new[i] = (i != 1) ? (i - 1) : 0;
     }
 
     for (int i = list->size + 1; i < list->capacity + 1; i++)
@@ -382,8 +381,8 @@ int list_sorted (struct list_t* list)
         prev_new[i] = (i != list->size + 1) ? (i - 1) : -1;
     }
 
-    list->head = 1;
-    list->tail = list->size;
+    next_new[0] = 1;
+    prev_new[0] = list->size;
 
     list->free = list->size + 1;
 
@@ -470,12 +469,12 @@ int list_realloc (struct list_t* list, size_t new_capacity)
 
 int list_head_element (struct list_t* list)
 {
-    return list->head;
+    return list->next[0];
 }
 
 int list_tail_element (struct list_t* list)
 {
-    return list->tail;
+    return list->prev[0];
 }
 
 elem_t list_value_element (struct list_t* list, int index)
@@ -523,7 +522,7 @@ int list_dump (struct list_t* list)
                              "\n\t free       = %d"
                              "\n\t {\n",
                              list->size, list->capacity, list->code_error, 
-                             list->head, list->tail, list->free);
+                             list->next[0], list->prev[0], list->free);
     fprintf (list_log_file, "\t\tvalue[%p]:\t", list->value);
     for (int i = 0; i < list->capacity + 1; i++)
     {
@@ -563,14 +562,14 @@ int list_error (struct list_t* list)
 
     if (pointer_list_check_null == 0)
     {
-        list->code_error |= CHECK_ERROR (!list->value,                LIST_ERROR_POINTER_BUFFER_VALUE_NULL);
-        list->code_error |= CHECK_ERROR (!list->next,                 LIST_ERROR_POINTER_BUFFER_NEXT_NULL);
-        list->code_error |= CHECK_ERROR (!list->prev,                 LIST_ERROR_POINTER_BUFFER_PREV_NULL);
-        list->code_error |= CHECK_ERROR (list->size < 0,              LIST_ERROR_SIZE_SMALLER_ZERO);
-        list->code_error |= CHECK_ERROR (list->capacity < 0,          LIST_ERROR_CAPACITY_SMALLER_ZERO);
-        list->code_error |= CHECK_ERROR (list->size > list->capacity, LIST_ERROR_SIZE_BIGGER_CAPACITY);
-        list->code_error |= CHECK_ERROR (list->head > list->capacity, LIST_ERROR_HEAD_BIGGER_CAPACITY);
-        list->code_error |= CHECK_ERROR (list->tail > list->capacity, LIST_ERROR_TAIL_BIGGER_CAPACITY);
+        list->code_error |= CHECK_ERROR (!list->value,                   LIST_ERROR_POINTER_BUFFER_VALUE_NULL);
+        list->code_error |= CHECK_ERROR (!list->next,                    LIST_ERROR_POINTER_BUFFER_NEXT_NULL);
+        list->code_error |= CHECK_ERROR (!list->prev,                    LIST_ERROR_POINTER_BUFFER_PREV_NULL);
+        list->code_error |= CHECK_ERROR (list->size < 0,                 LIST_ERROR_SIZE_SMALLER_ZERO);
+        list->code_error |= CHECK_ERROR (list->capacity < 0,             LIST_ERROR_CAPACITY_SMALLER_ZERO);
+        list->code_error |= CHECK_ERROR (list->size > list->capacity,    LIST_ERROR_SIZE_BIGGER_CAPACITY);
+        list->code_error |= CHECK_ERROR (list->next[0] > list->capacity, LIST_ERROR_HEAD_BIGGER_CAPACITY);
+        list->code_error |= CHECK_ERROR (list->prev[0] > list->capacity, LIST_ERROR_TAIL_BIGGER_CAPACITY);
     }
 
     return list->code_error;
@@ -606,4 +605,134 @@ int decoder_list_error (struct list_t* list)
 #endif
 
     return GOOD_WORKING;
+}
+
+int list_graph_dump (struct list_t* list)
+{
+    FILE* list_log_graph = fopen ("List/graph_log.dot", "w");
+    if (list_log_graph == nullptr)
+    {
+        printf ("ERROR FOPEN on line %d in list.cpp", __LINE__);
+        return ERROR_FILE_CLOSE;
+    }
+
+   char* list_status = (char*) calloc (10, sizeof(char));
+
+    if (list->code_error == 0)
+    {
+        strcpy (list_status, "OK");
+    }
+    else
+    {
+        decoder_list_error (list);
+        strcpy (list_status, "ERROR");
+    }
+
+    fprintf (list_log_graph, "digraph G\n{\n");
+    fprintf (list_log_graph, "\tgraph [dpi = 300];\n");
+    fprintf (list_log_graph, "\trankdir = LR;\n");
+
+    int free_elem = list->free;
+    char* color = (char*) calloc (10, sizeof(char));
+
+    for (int i = 0; i < list->capacity + 1; i++)
+    {   
+        if (isfree (list, i))
+        {
+            strcpy (color, "#FA8072");
+            free_elem = list->next[free_elem];
+        }
+        else
+        {
+            strcpy (color, "#87CEFA");
+        }
+
+        if (i == 0)
+        {
+            fprintf (list_log_graph,    "\t\"Nod_0\" [shape = \"record\", style = \"rounded, filled\", fontname = \"Helvetica-Bold\", fillcolor = \"#F4A460\","
+                                        "\n\t\t   label = \"index = NULL_ELEMENT | {<prev> prev = %d |",
+                                        list->prev[0]);
+        }
+        else
+        {
+            fprintf (list_log_graph,    "\t\"Nod_%d\" [shape = \"record\", style = \"rounded, filled\", fontname = \"Helvetica-Bold\", fillcolor = \"%s\","
+                                        "\n\t\t   label = \"index = %d | {<prev> prev = %d|", i, color, i, list->prev[i]);
+        }
+        
+        if (isnan (list->value[i]))
+        {
+            fprintf (list_log_graph,    "value = POISON_VALUE | <next> next = %d}\"]\n", list->next[i]);
+        }
+        else
+        {
+            fprintf (list_log_graph,    "value = %lf | <next> next = %d}\"]\n",
+                                        list->value[i], list->next[i]);
+        }
+    }
+
+    fprintf (list_log_graph,    "\t\"LIST_INFO\" [shape = \"record\", style = \"rounded, filled\", fontname = \"Helvetica-Bold\"\n\t\t\t\t "
+				                "label = \"SIZE = %lu\\lCAPACITY = %lu\\lFIRST FREE = %d\\lCODE OF ERROR = %lu\"]\n",
+                                list->size, list->capacity, list->free, list->code_error);
+    fprintf(list_log_graph, "\t\"LIST DUMP for List[%p] (%s)\"[color = \"white\"]\t", list, list_status);
+
+    for (int i = 0; i < list->capacity; i++)
+    {
+         fprintf (list_log_graph, "\t\"Nod_%d\"->\"Nod_%d\"[style = \"invis\", weight=1000]\n", i, i + 1);
+    }
+
+    int physical_position = list->next[0];
+    for (int i = 0; i < list->size + 1; i++)
+    {
+        fprintf (list_log_graph, "\t\"Nod_%d\":next -> \"Nod_%d\":prev[style = \"bold\", color = \"#df1b1bdf\"]\n", physical_position, list->next[physical_position]);
+        physical_position = list->next[physical_position];
+    }
+    physical_position = list->free;
+    for (int i = 1; i < list->capacity - list->size; i++)
+    {
+        fprintf (list_log_graph, "\t\"Nod_%d\":next -> \"Nod_%d\":prev[style = \"bold\", color = \"#1b4cdfe0\"]\n", physical_position, list->next[physical_position]);
+        physical_position = list->next[physical_position];
+    }
+
+    fprintf (list_log_graph, "\n}");
+
+    free (color);
+    free (list_status);
+
+    fclose (list_log_graph);
+
+    system("dot -Tjpeg -oList/graph_log_list.jpeg List/graph_log.dot");
+
+    //system("convert graph_log_list.jpeg -append graph_array.jpeg");
+
+    return GOOD_WORKING;
+}
+
+int isnan (double number)
+{
+    if (number != number)
+    {
+        return 1;
+    }
+    return 0;
+}
+
+int isfree (struct list_t* list, int index)
+{
+    int physical_position = list->free;
+    if (index == physical_position)
+    {
+        return 1;
+    }
+    for (int j = 1; j < list->capacity - list->size + 1; j++)
+    {
+        if (index == physical_position)
+        {
+            return 1;
+        }
+        else
+        {
+            physical_position = list->next[physical_position];
+        }
+    }
+    return 0;
 }

@@ -1,9 +1,9 @@
-all: main.cpp list.cpp
-	g++ main.cpp list.cpp -o all_list
+all: List/main.cpp List/list.cpp
+	g++ List/main.cpp List/list.cpp -o all_list
 
-release: main.cpp list.cpp
-	g++ main.cpp list.cpp -o list_release
+debug: List/main.cpp List/list.cpp
+	g++ List/main.cpp List/list.cpp -DNDEBUG -o list_debug
 
-debug: main.cpp list.cpp
-	g++ main.cpp list.cpp -DNDEBUG -o list_debug
+list_p: List_pointer/main.cpp List_pointer/list_pointer.cpp
+	g++ List_pointer/main.cpp List_pointer/list_pointer.cpp -o list_p
 
