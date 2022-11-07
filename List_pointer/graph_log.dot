@@ -3,14 +3,14 @@ digraph G
 	graph [dpi = 300];
 	rankdir = LR;
 	"Nod_0" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#87CEFA",
-		   label = "index = 0 [0x7fd405c058f0]| {<prev> prev = 0x0| value = 567.000000 | <next> next = 0x7fd405c05910}"]
+		   label = "index = 0 [0x7fba3e504080]| {<prev> prev = 0x0| value = 45.000000 | <next> next = 0x7fba3e4058d0}"]
 	"Nod_1" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#87CEFA",
-		   label = "index = 1 [0x7fd405c05910]| {<prev> prev = 0x7fd405c058f0| value = 567.000000 | <next> next = 0x7fd405c058d0}"]
+		   label = "index = 1 [0x7fba3e4058d0]| {<prev> prev = 0x7fba3e504080| value = 35.000000 | <next> next = 0x7fba3e405a90}"]
 	"Nod_2" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#87CEFA",
-		   label = "index = 2 [0x7fd405c058d0]| {<prev> prev = 0x7fd405c05910| value = 45.000000 | <next> next = 0x0}"]
+		   label = "index = 2 [0x7fba3e405a90]| {<prev> prev = 0x7fba3e4058d0| value = 45.000000 | <next> next = 0x0}"]
 	"LIST_INFO" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold"
 				 label = "SIZE = 3\lCODE ERROR = 0"]
-	"LIST DUMP for List[0x7ffeeea727c8]"[color = "white"]		"Nod_0"->"Nod_1"[style = "invis", weight=1000]
+	"LIST DUMP for List[0x7ffeec2f6758]"[color = "white"]		"Nod_0"->"Nod_1"[style = "invis", weight=1000]
 	"Nod_1"->"Nod_2"[style = "invis", weight=1000]
 	"Nod_0":next -> "Nod_1":prev[style = "bold", color = "#df1b1bdf"]
 	"Nod_1":next -> "Nod_2":prev[style = "bold", color = "#df1b1bdf"]

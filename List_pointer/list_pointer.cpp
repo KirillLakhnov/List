@@ -290,6 +290,8 @@ size_t list_pointer_size (struct list_pointer_t* list_pointer)
 
 int list_pointer_graph_dump (struct list_pointer_t* list_pointer)
 {
+    static int number_of_function_launches = 0;
+
     FILE* list_log_graph = fopen ("List_pointer/graph_log.dot", "w");
     if (list_log_graph == nullptr)
     {
@@ -347,9 +349,26 @@ int list_pointer_graph_dump (struct list_pointer_t* list_pointer)
     }
     fprintf (list_log_graph, "\n}");
 
-    fclose (list_log_graph);
+    if (fclose (list_log_graph))
+    {
+        printf ("ERROR FCLOSE on line %d in list.cpp", __LINE__);
+        return ERROR_FILE_CLOSE;
+    }
 
-    system("dot -Tjpeg -oList_pointer/graph_log_list.jpeg List_pointer/graph_log.dot");
+    char command[100] = "";
+    sprintf (command, "dot -Tpng -oList_pointer/graph_log_list_%d.png List_pointer/graph_log.dot", number_of_function_launches);
+
+    system(command);
+
+    FILE* htm_log_file = fopen ("List_pointer/htm_log_file_pointer.htm", "a");
+
+    fprintf (htm_log_file, "<pre>\n");
+    fprintf (htm_log_file, "<img src = \"graph_log_list_%d.png\">", number_of_function_launches);
+    fprintf (htm_log_file, "<hr>\n");
+
+    fclose(htm_log_file);
+
+    number_of_function_launches++;
 
     return GOOD_WORKING;
 }

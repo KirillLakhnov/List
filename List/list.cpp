@@ -609,6 +609,8 @@ int decoder_list_error (struct list_t* list)
 
 int list_graph_dump (struct list_t* list)
 {
+    static int number_of_function_launches = 0;
+
     FILE* list_log_graph = fopen ("List/graph_log.dot", "w");
     if (list_log_graph == nullptr)
     {
@@ -700,9 +702,20 @@ int list_graph_dump (struct list_t* list)
 
     fclose (list_log_graph);
 
-    system("dot -Tjpeg -oList/graph_log_list.jpeg List/graph_log.dot");
+    char command[100] = "";
+    sprintf (command, "dot -Tpng -oList/graph_log_list_%d.png List/graph_log.dot", number_of_function_launches);
 
-    //system("convert graph_log_list.jpeg -append graph_array.jpeg");
+    system(command);
+
+    FILE* htm_log_file = fopen ("List/htm_log_file.htm", "a");
+
+    fprintf (htm_log_file, "<pre>\n");
+    fprintf (htm_log_file, "<img src = \"graph_log_list_%d.png\">", number_of_function_launches);
+    fprintf (htm_log_file, "<hr>\n");
+
+    fclose(htm_log_file);
+
+    number_of_function_launches++;
 
     return GOOD_WORKING;
 }
